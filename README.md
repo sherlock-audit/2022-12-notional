@@ -1,4 +1,4 @@
-# {project} contest details
+# Notional contest details
 
 - Join [Sherlock Discord](https://discord.gg/MABEWyASkp)
 - Submit findings using the issue page in your private contest repo (label issues as med or high)
@@ -6,8 +6,8 @@
 
 # Resources
 
-- [resource1](url)
-- [resource2](url)
+- [Twitter](https://twitter.com/NotionalFinance)
+- [Website](https://www.notional.finance/)
 
 # On-chain context
 
@@ -25,4 +25,4 @@ ADMIN: [trusted, restricted, n/a]
 
 # Audit scope
 
-# About {project}
+# About Notional
