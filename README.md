@@ -25,4 +25,12 @@ ADMIN: [trusted, restricted, n/a]
 
 # Audit scope
 
+PR #35 - Implementing new strategy token valuation model + balancer oracle removal
+
+https://github.com/notional-finance/leveraged-vaults/pull/35/files
+
+PR #39 - Fixing boosted pool
+
+https://github.com/notional-finance/leveraged-vaults/pull/39/files
+
 # About Notional
