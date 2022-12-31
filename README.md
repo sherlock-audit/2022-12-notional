@@ -11,32 +11,78 @@
 
 # On-chain context
 
-TO FILL IN BY PROTOCOL
-
 ```
-DEPLOYMENT: [e.g. mainnet, arbitrum, optimism, ..]
-ERC20: [e.g. any, none, USDC, USDC and USDT]
-ERC721: [e.g. any, none, UNI-V3]
-ERC777: [e.g. any, none, {token name}]
-FEE-ON-TRANSFER: [e.g. any, none, {token name}]
-REBASING TOKENS: [e.g. any, none, {token name}]
-ADMIN: [trusted, restricted, n/a]
+DEPLOYMENT: mainnet
+ADMIN: trusted
 ```
-In case of restricted, by default Sherlock does not consider direct protocol rug pulls as a valid issue unless the protocol clearly describes in detail the conditions for these restrictions. 
-For contracts, owners, admins clearly distinguish the ones controlled by protocol vs user controlled. This helps watsons distinguish the risk factor. 
-Example: 
-* `ContractA.sol` is owned by the protocol. 
-* `admin` in `ContractB` is restricted to changing properties in `functionA` and should not be able to liquidate assets or affect user withdrawals in any way. 
-* `admin` in `ContractC` is user admin and is restricted to only `functionB`
-
 # Audit scope
 
 PR #35 - Implementing new strategy token valuation model + balancer oracle removal
 
 https://github.com/notional-finance/leveraged-vaults/pull/35/files
 
+Background:
+As a result of findings from the first Sherlock Leveraged Vault audit, we decided
+to refactor the oracle valuation method to depend on Chainlink oracles instead of
+the native Balancer pool TWAP oracle. These changes were too large for the fix review
+and therefore are included in this audit.
+
+Specific Focus Areas for PR #35:
+  - Adding AccessControlUpgradeable in contracts/vaults/BaseStrategyVault.sol
+  - Changes to oracle valuation method:
+    - contracts/vaults/balancer/internal/math/Stable2TokenOracleMath.sol
+    - contracts/vaults/balancer/internal/pool/TwoTokenPoolUtils.sol
+
 PR #39 - Fixing boosted pool
 
 https://github.com/notional-finance/leveraged-vaults/pull/39/files
+
+Background:
+The first Sherlock audit covered the Boosted3TokenAura strategy, however,
+Balancer has since migrated the Boosted3Token pool from the legacy BoostedPool
+structure to a new ComposableBoostedPool contract. The changes in this PR are
+related to adapting to the new ComposableBoostedPool as well as changing the valuation
+methodology to rely on Chainlink. The relevant Balancer ComposableBoostedPool contract
+can be found here: https://etherscan.io/address/0xa13a9247ea42d743238089903570127dda72fe44#code
+
+Specific Focus Areas for PR #39:
+  - Changes to the Boosted3TokenAura Strategy:
+    - contracts/vaults/balancer/external/Boosted3TokenAuraHelper.sol
+    - contracts/vaults/balancer/internal/pool/Boosted3TokenPoolUtils.sol
+    - contracts/vaults/balancer/internal/math/LinearMath.sol
+    - contracts/vaults/balancer/internal/math/StableMath.sol
+    - contracts/vaults/balancer/mixins/Boosted3TokenPoolMixin.sol
+
+# Running Unit Tests
+
+### Install brownie
+```
+python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+pipx install eth-brownie
+```
+https://eth-brownie.readthedocs.io/en/stable/install.html
+
+### Install hardhat
+```
+yarn install
+```
+### Add mainnet-fork
+* Add the following YAML block to ~/.brownie/network-config.yaml under development
+```
+- name: Hardhat (Mainnet Fork)
+  id: mainnet-fork
+  cmd: "npx.cmd hardhat node"
+  host: http://127.0.0.1
+  timeout: 120
+  cmd_settings:
+    port: 8545
+    fork: mainnet
+```
+https://eth-brownie.readthedocs.io/en/stable/network-management.html#
+### Execute tests
+```
+brownie run tests/balancer --network mainnet-fork
+```
 
 # About Notional
